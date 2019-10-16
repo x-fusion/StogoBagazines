@@ -13,7 +13,7 @@ namespace StogoBagazines.DataAccess.Objects
         /// <summary>
         /// Identification key
         /// </summary>
-        public int Id { get; }
+        public int Id { get; private set; }
         /// <summary>
         /// Item's title
         /// </summary>
@@ -70,6 +70,12 @@ namespace StogoBagazines.DataAccess.Objects
             Revenue = totalRevenue;
             TotalRentDuration = totalRentDuration;
         }
+        /// <summary>
+        /// Updates object with rent information
+        /// </summary>
+        /// <param name="amount">Amount of items is going to be rented</param>
+        /// <param name="duration">Amount of days items going to spent in rent</param>
+        /// <returns>If such rent is possible, local object is updated on True</returns>
         public bool Rent(int amount, int duration)
         {
             if(Amount - amount < 0)
