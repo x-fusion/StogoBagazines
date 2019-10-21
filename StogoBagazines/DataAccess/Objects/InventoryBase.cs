@@ -13,7 +13,7 @@ namespace StogoBagazines.DataAccess.Objects
         /// <summary>
         /// Identification key
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; set; }
         /// <summary>
         /// Item's title
         /// </summary>
@@ -21,23 +21,23 @@ namespace StogoBagazines.DataAccess.Objects
         /// <summary>
         /// Count of particular item in warehouse
         /// </summary>
-        public int Amount { get; private set; }
+        public int Amount { get; set; }
         /// <summary>
         /// Price for renting purposes
         /// </summary>
-        public decimal RentPrice => decimal.Divide(MonetaryValue, MonetaryValue / 10);
+        public decimal RentPrice => decimal.Multiply(MonetaryValue, MonetaryValue / 10);
         /// <summary>
         /// Revenue generated during rentals
         /// </summary>
-        public decimal Revenue { get; }
+        public decimal Revenue { get; set; }
         /// <summary>
         /// Days spent at rent
         /// </summary>
-        public int TotalRentDuration { get; private set; }
+        public int TotalRentDuration { get; set; }
         /// <summary>
-        /// Price for used selling purposes
+        /// Price used for selling purposes
         /// </summary>
-        public decimal MonetaryValue { get; }
+        public decimal MonetaryValue { get; set; }
         /// <summary>
         /// Constructor for local object
         /// </summary>

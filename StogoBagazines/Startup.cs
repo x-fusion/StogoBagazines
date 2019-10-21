@@ -26,6 +26,7 @@ namespace StogoBagazines
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddTransient(_ => new DataAccess.Database(Configuration.GetConnectionString("MySQLDb")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
