@@ -31,9 +31,10 @@ namespace StogoBagazines.DataAccess.Interfaces
         /// <summary>
         /// Updates particular object
         /// </summary>
+        /// <param name="id">Object to update reference</param>
         /// <param name="updatedDataObject">Object which will replace old version of it</param>
         /// <returns>Updated object</returns>
-        bool Update(T updatedDataObject);
+        bool Update(object id, T updatedDataObject);
         /// <summary>
         /// Deletes object from database
         /// </summary>
@@ -45,6 +46,6 @@ namespace StogoBagazines.DataAccess.Interfaces
         /// </summary>
         /// <param name="id">Object identification key</param>
         /// <returns>Status of object existence</returns>
-        bool Exits(object id);
+        bool Exists(object id);
     }
 }

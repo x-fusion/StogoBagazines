@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StogoBagazines.DataAccess.Interfaces;
-using StogoBagazines.DataAccess.Objects;
+using StogoBagazines.DataAccess.Models;
 
 namespace StogoBagazines.DataAccess.Repositories
 {
@@ -27,7 +27,7 @@ namespace StogoBagazines.DataAccess.Repositories
             throw new NotImplementedException();
         }
 
-        public bool Exits(object id)
+        public bool Exists(object id)
         {
             throw new NotImplementedException();
         }
@@ -42,7 +42,7 @@ namespace StogoBagazines.DataAccess.Repositories
             throw new NotImplementedException();
         }
 
-        public bool Update(BicycleRack updatedDataObject)
+        public bool Update(object id, BicycleRack updatedDataObject)
         {
             throw new NotImplementedException();
         }

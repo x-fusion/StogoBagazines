@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using StogoBagazines.DataAccess.Repositories;
-using StogoBagazines.DataAccess.Objects;
+using StogoBagazines.DataAccess.Models;
 
 namespace StogoBagazines
 {

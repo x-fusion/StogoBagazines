@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StogoBagazines.DataAccess.Objects
+namespace StogoBagazines.DataAccess.Models
 {
     /// <summary>
     /// Class type representing WheelChain object

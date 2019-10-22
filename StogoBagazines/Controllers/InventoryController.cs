@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StogoBagazines.DataAccess;
 using StogoBagazines.DataAccess.Repositories;
-using StogoBagazines.DataAccess.Objects;
+using StogoBagazines.DataAccess.Models;
 
 namespace StogoBagazines.Controllers
 {
@@ -44,9 +44,16 @@ namespace StogoBagazines.Controllers
         /// </summary>
         /// <returns>Enumerable array</returns>
         [HttpGet]
-        public IEnumerable<InventoryBase> Get()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public ActionResult<IEnumerable<InventoryBase>> Get()
         {
-            return repository.ReadAll();
+            List<InventoryBase> results = repository.ReadAll().ToList();
+            if (results.Count > 0)
+            {
+                return Ok(results);
+            }
+            return NoContent();
         }
 
         // GET: api/Inventory/5
@@ -55,10 +62,17 @@ namespace StogoBagazines.Controllers
         /// </summary>
         /// <param name="id">Identification key</param>
         /// <returns>Inventory object</returns>
-        [HttpGet("{id}", Name = "Get")]
-        public InventoryBase Get(object id)
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<InventoryBase> Get(int id)
         {
-            return repository.Read(id);
+            InventoryBase result = repository.Read(id);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return NotFound(new KeyValuePair<string, int>("id", id));
         }
 
         // POST: api/Inventory
@@ -67,30 +81,58 @@ namespace StogoBagazines.Controllers
         /// </summary>
         /// <param name="value">Inventory item serialised in request body</param>
         [HttpPost]
-        public void Post([FromBody] InventoryBase value)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Post([FromBody] InventoryBase value)
         {
-
+            if (!value.Title.Equals("") && value.Amount >= 0 && value.MonetaryValue > 0)
+            {
+                return Ok(repository.Create(value));
+            }
+            return BadRequest(value);
         }
 
         // PUT: api/Test/5
         /// <summary>
-        /// 
+        /// Updates existing Inventory entry in database
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="value"></param>
+        /// <param name="id">Object to update</param>
+        /// <param name="value">Updated object</param>
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult Put(int id, [FromBody] InventoryBase value)
         {
+            if (repository.Exists(id))
+            {
+                if (repository.Update(id, value))
+                {
+                    return Ok();
+                }
+                return BadRequest(value);
+            }
+            return NotFound(new KeyValuePair<string, int>("id", id));
         }
 
-        // DELETE: api/ApiWithActions/5
+        // DELETE: api/Inventory/5
         /// <summary>
-        /// 
+        /// Deletes existing Inventory entry in database
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">Inventory entry to be deleted reference</param>
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult Delete(int id)
         {
+            if(repository.Exists(id))
+            {
+                if (repository.Delete(id))
+                {
+                    return Ok();
+                }
+            }
+            return NotFound(new KeyValuePair<string, int>("id", id));
         }
     }
 }

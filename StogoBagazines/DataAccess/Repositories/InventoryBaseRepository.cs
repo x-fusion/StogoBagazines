@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StogoBagazines.DataAccess.Interfaces;
-using StogoBagazines.DataAccess.Objects;
+using StogoBagazines.DataAccess.Models;
 using MySql.Data.MySqlClient;
 
 namespace StogoBagazines.DataAccess.Repositories
@@ -87,7 +87,7 @@ namespace StogoBagazines.DataAccess.Repositories
         /// </summary>
         /// <param name="id">Reference of entry</param>
         /// <returns>Does exist</returns>
-        public bool Exits(object id)
+        public bool Exists(object id)
         {
             MySqlCommand sqlCommand = new MySqlCommand
             {
@@ -167,14 +167,15 @@ namespace StogoBagazines.DataAccess.Repositories
         /// <summary>
         /// Updates entry in database entity
         /// </summary>
+        /// <param name="id">Object to update id</param>
         /// <param name="updatedDataObject">Updated entry</param>
         /// <returns>If update was successful</returns>
-        public bool Update(InventoryBase updatedDataObject)
+        public bool Update(object id, InventoryBase updatedDataObject)
         {
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = "UPDATE Inventory SET Title = @Title,Amount=@Amount,Revenue=@Revenue,TotalRentDuration=@TotalRentDuration,MonetaryValue=@TotalRentDuration WHERE Id=@Id;"
+                CommandText = "UPDATE Inventory SET Title = @Title,Amount=@Amount,Revenue=@Revenue,TotalRentDuration=@TotalRentDuration,MonetaryValue=@MonetaryValue WHERE Id=@Id;"
             };
             Database.Connection.Open();
             using(Database.Connection)
@@ -185,7 +186,7 @@ namespace StogoBagazines.DataAccess.Repositories
                 sqlCommand.Parameters.AddWithValue("@Revenue", updatedDataObject.Revenue);
                 sqlCommand.Parameters.AddWithValue("@TotalRentDuration", updatedDataObject.TotalRentDuration);
                 sqlCommand.Parameters.AddWithValue("@MonetaryValue", updatedDataObject.MonetaryValue);
-                sqlCommand.Parameters.AddWithValue("@Id", updatedDataObject.Id);
+                sqlCommand.Parameters.AddWithValue("@Id", id);
                 MySqlTransaction sqlTransaction = Database.Connection.BeginTransaction();
                 if (sqlCommand.ExecuteNonQuery() == 1)
                 {
