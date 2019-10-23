@@ -20,6 +20,7 @@ namespace StogoBagazines.DataAccess.Models
         /// </summary>
         [Required(AllowEmptyStrings = false, ErrorMessage = "Title is manditory")]
         [StringLength(255, ErrorMessage = "Length has to be between 5 and 255 symbols", MinimumLength = 5)]
+        [DataType(DataType.Text, ErrorMessage = "Invalid title provided")]
         public string Title { get; set; }
         /// <summary>
         /// Count of particular item in warehouse
@@ -30,24 +31,30 @@ namespace StogoBagazines.DataAccess.Models
         /// <summary>
         /// Price for renting purposes
         /// </summary>
+        [Range(0, double.MaxValue, ErrorMessage = "Not valid decimal value")]
         public decimal RentPrice => decimal.Multiply(MonetaryValue, MonetaryValue / 10);
         /// <summary>
         /// Revenue generated during rentals
         /// </summary>
+        [Range(0, double.MaxValue, ErrorMessage = "Not valid decimal value")]
         public decimal Revenue { get; set; }
         /// <summary>
         /// Days spent at rent
         /// </summary>
+        [Range(0, int.MaxValue, ErrorMessage = "Not valid integer value")]
         public int TotalRentDuration { get; set; }
         /// <summary>
         /// Price used for selling purposes
         /// </summary>
         [Required(ErrorMessage = "Monetary value is manditory")]
         [Range(0, double.MaxValue, ErrorMessage = "Not valid decimal value")]
+        [DataType(DataType.Currency, ErrorMessage = "Invalid value provided")]
         public decimal MonetaryValue { get; set; }
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public InventoryBase()
         {
-
         }
         /// <summary>
         /// Constructor for local object
@@ -97,10 +104,21 @@ namespace StogoBagazines.DataAccess.Models
             TotalRentDuration += amount * duration;
             return true;
         }
-
+        /// <summary>
+        /// Custom property and object level validation
+        /// </summary>
+        /// <param name="validationContext">Properties and their values</param>
+        /// <returns>Fields and their's errors</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            throw new NotImplementedException();
+            var results = new List<ValidationResult>();
+            List<string> members = new List<string>();
+            if(MonetaryValue <= 0)
+            {
+                members.Add(nameof(MonetaryValue));
+                results.Add(new ValidationResult("Monetary value cannot be 0 or lower", members));
+            }
+            return results;
         }
     }
 }

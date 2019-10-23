@@ -110,7 +110,6 @@ namespace StogoBagazines.Controllers
                 {
                     return Ok();
                 }
-                return BadRequest(value);
             }
             return NotFound(new KeyValuePair<string, int>("id", id));
         }
