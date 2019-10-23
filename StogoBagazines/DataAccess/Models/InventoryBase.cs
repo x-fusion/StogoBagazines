@@ -18,14 +18,14 @@ namespace StogoBagazines.DataAccess.Models
         /// <summary>
         /// Item's title
         /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Title is manditory")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Title is manditory field")]
         [StringLength(255, ErrorMessage = "Length has to be between 5 and 255 symbols", MinimumLength = 5)]
         [DataType(DataType.Text, ErrorMessage = "Invalid title provided")]
         public string Title { get; set; }
         /// <summary>
         /// Count of particular item in warehouse
         /// </summary>
-        [Required(ErrorMessage = "Amount is manditory")]
+        [Required(ErrorMessage = "Amount is manditory field")]
         [Range(0, int.MaxValue, ErrorMessage = "Not valid integer value")]
         public int Amount { get; set; }
         /// <summary>
@@ -46,12 +46,12 @@ namespace StogoBagazines.DataAccess.Models
         /// <summary>
         /// Price used for selling purposes
         /// </summary>
-        [Required(ErrorMessage = "Monetary value is manditory")]
+        [Required(ErrorMessage = "Monetary value is manditory field")]
         [Range(0, double.MaxValue, ErrorMessage = "Not valid decimal value")]
         [DataType(DataType.Currency, ErrorMessage = "Invalid value provided")]
         public decimal MonetaryValue { get; set; }
         /// <summary>
-        /// Empty constructor
+        /// Constructor used in serialization
         /// </summary>
         public InventoryBase()
         {
@@ -109,7 +109,7 @@ namespace StogoBagazines.DataAccess.Models
         /// </summary>
         /// <param name="validationContext">Properties and their values</param>
         /// <returns>Fields and their's errors</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var results = new List<ValidationResult>();
             List<string> members = new List<string>();

@@ -13,6 +13,7 @@ namespace StogoBagazines.DataAccess.Repositories
     /// </summary>
     public class InventoryBaseRepository : Repository, IRepository<InventoryBase>
     {
+        private string InvetoryBaseTable => "Inventory";
         /// <summary>
         /// Repository constructor
         /// </summary>
@@ -99,14 +100,12 @@ namespace StogoBagazines.DataAccess.Repositories
             sqlCommand.Parameters.AddWithValue("@Id", id);
             using (Database.Connection)
             {
-                using (MySqlDataReader reader = sqlCommand.ExecuteReader())
+                using MySqlDataReader reader = sqlCommand.ExecuteReader();
+                if (reader.Read())
                 {
-                    if (reader.Read())
-                    {
-                        return true;
-                    }
-                    return false;
+                    return true;
                 }
+                return false;
             }
         }
         /// <summary>
@@ -126,15 +125,13 @@ namespace StogoBagazines.DataAccess.Repositories
             sqlCommand.Parameters.AddWithValue("@Id", id);
             using (Database.Connection)
             {
-                using (MySqlDataReader reader = sqlCommand.ExecuteReader())
+                using MySqlDataReader reader = sqlCommand.ExecuteReader();
+                if (reader.Read())
                 {
-                    if (reader.Read())
-                    {
-                        return new InventoryBase(reader.GetInt32("Id"), reader.GetString("Title"),
-                        reader.GetInt32("Amount"), reader.GetDecimal("Revenue"), reader.GetInt32("TotalRentDuration"), reader.GetDecimal("MonetaryValue"));
-                    }
-                    return null;
+                    return new InventoryBase(reader.GetInt32("Id"), reader.GetString("Title"),
+                    reader.GetInt32("Amount"), reader.GetDecimal("Revenue"), reader.GetInt32("TotalRentDuration"), reader.GetDecimal("MonetaryValue"));
                 }
+                return null;
             }
         }
         /// <summary>
@@ -152,16 +149,14 @@ namespace StogoBagazines.DataAccess.Repositories
             sqlCommand.Prepare();
             using (Database.Connection)
             {
-                using (MySqlDataReader reader = sqlCommand.ExecuteReader())
+                using MySqlDataReader reader = sqlCommand.ExecuteReader();
+                List<InventoryBase> items = new List<InventoryBase>();
+                while (reader.Read())
                 {
-                    List<InventoryBase> items = new List<InventoryBase>();
-                    while (reader.Read())
-                    {
-                        items.Add(new InventoryBase(reader.GetInt32("Id"), reader.GetString("Title"),
-                        reader.GetInt32("Amount"), reader.GetDecimal("Revenue"), reader.GetInt32("TotalRentDuration"), reader.GetDecimal("MonetaryValue")));
-                    }
-                    return items;
+                    items.Add(new InventoryBase(reader.GetInt32("Id"), reader.GetString("Title"),
+                    reader.GetInt32("Amount"), reader.GetDecimal("Revenue"), reader.GetInt32("TotalRentDuration"), reader.GetDecimal("MonetaryValue")));
                 }
+                return items;
             }
         }
         /// <summary>

@@ -1,27 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace StogoBagazines.DataAccess.Models
 {
     /// <summary>
-    /// Class type representing Crossbar object
+    /// Class type representing Bicycle rack object
     /// </summary>
-    public class BicycleRack : InventoryBase
+    public class BicycleRack : InventoryBase, IValidatableObject
     {
+        /// <summary>
+        /// Database reference to parent entry
+        /// </summary>
+        public int InventoryId { get; set; }
         /// <summary>
         /// Limit of how many bikes rack can hold
         /// </summary>
+        [Required(ErrorMessage = "Bike limit is manditory field")]
+        [Range(1, 4, ErrorMessage = "Bike limit is between 1 and 4")]
         public int BikeLimit { get; set; }
         /// <summary>
         /// Weight limit (kg)
         /// </summary>
+        [Required(ErrorMessage = "Lift power is manditory field")]
+        [Range(0, double.MaxValue, ErrorMessage = "Invalid lift power provided")]
         public double LiftPower { get; set; }
         /// <summary>
         /// Rack assertion type
         /// </summary>
+        [Required(ErrorMessage = "Assertion type is manditory field")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public AssertionType Assertion { get; set; }
+        /// <summary>
+        /// Constructor used in serialization
+        /// </summary>
+        public BicycleRack() { }
         /// <summary>
         /// Local custructor with custom descriptors
         /// </summary>
@@ -54,6 +70,29 @@ namespace StogoBagazines.DataAccess.Models
             BikeLimit = limit;
             LiftPower = power;
             Assertion = assertion;
+        }
+        /// <summary>
+        /// Custom property and object level validation
+        /// </summary>
+        /// <param name="validationContext">Properties and their values</param>
+        /// <returns>Fields and their's errors</returns>
+        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            //validacija nenaudoja tevynes klases validacijos??? pvz amount net neirasyta ir nemeta klaidos, reikia pabandyti su tevyne klase
+            var results = new List<ValidationResult>();
+            List<string> members = new List<string>();
+            foreach(var type in Enum.GetValues(typeof(AssertionType)))
+            {
+                if(string.Equals(Assertion.ToString(), type.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    break;
+                } else
+                {
+                    members.Add(nameof(Assertion));
+                    results.Add(new ValidationResult("Such assertion type is not allowed", members));
+                }
+            }
+            return results;
         }
         /// <summary>
         /// Ways of how rack can be asserted

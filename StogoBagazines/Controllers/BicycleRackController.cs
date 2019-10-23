@@ -13,12 +13,12 @@ namespace StogoBagazines.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class InventoryController : ControllerBase
+    public class BicycleRackController : ControllerBase
     {
         /// <summary>
         /// Logging object
         /// </summary>
-        private readonly ILogger<InventoryController> logger;
+        private readonly ILogger<BicycleRackController> logger;
         /// <summary>
         /// Database object
         /// </summary>
@@ -26,19 +26,19 @@ namespace StogoBagazines.Controllers
         /// <summary>
         /// Repository object
         /// </summary>
-        private readonly InventoryBaseRepository repository;
+        private readonly BicycleRackRepository repository;
         /// <summary>
         /// API endpoint constructor
         /// </summary>
         /// <param name="logger">Dependency injection logging object</param>
         /// <param name="database">Dependency injection database object</param>
-        public InventoryController(ILogger<InventoryController> logger, Database database)
+        public BicycleRackController(ILogger<BicycleRackController> logger, Database database)
         {
             this.logger = logger;
             this.database = database;
-            repository = new InventoryBaseRepository(database);
+            repository = new BicycleRackRepository(database);
         }
-        // GET: api/Inventory
+        // GET: api/BicycleRack
         /// <summary>
         /// Returns all available InventoryBase objects
         /// </summary>
@@ -46,9 +46,9 @@ namespace StogoBagazines.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult<IEnumerable<InventoryBase>> Get()
+        public ActionResult<IEnumerable<BicycleRack>> Get()
         {
-            List<InventoryBase> results = repository.ReadAll().ToList();
+            List<BicycleRack> results = repository.ReadAll().ToList();
             if (results.Count > 0)
             {
                 return Ok(results);
@@ -56,7 +56,7 @@ namespace StogoBagazines.Controllers
             return NoContent();
         }
 
-        // GET: api/Inventory/5
+        // GET: api/BicycleRack/5
         /// <summary>
         /// Returns particular Inventory based on identity key
         /// </summary>
@@ -65,7 +65,7 @@ namespace StogoBagazines.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<InventoryBase> Get(int id)
+        public ActionResult<BicycleRack> Get(int id)
         {
             InventoryBase result = repository.Read(id);
             if (result != null)
@@ -75,20 +75,20 @@ namespace StogoBagazines.Controllers
             return NotFound(new KeyValuePair<string, int>("id", id));
         }
 
-        // POST: api/Inventory
+        // POST: api/BicycleRack
         /// <summary>
-        /// Inserts new Inventory item into database set
+        /// Inserts new Bicycle Rack item into database set
         /// </summary>
-        /// <param name="value">Inventory item serialised in request body</param>
+        /// <param name="value">Bicycle Rack item serialised in request body</param>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Post([FromBody] InventoryBase value)
+        public IActionResult Post([FromBody] BicycleRack value)
         {
             return Ok(repository.Create(value));
         }
 
-        // PUT: api/Inventory/5
+        // PUT: api/BicycleRack/5
         /// <summary>
         /// Updates existing Inventory entry in database
         /// </summary>
@@ -98,7 +98,7 @@ namespace StogoBagazines.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Put(int id, [FromBody] InventoryBase value)
+        public IActionResult Put(int id, [FromBody] BicycleRack value)
         {
             if (repository.Exists(id))
             {
@@ -110,7 +110,7 @@ namespace StogoBagazines.Controllers
             return NotFound(new KeyValuePair<string, int>("id", id));
         }
 
-        // DELETE: api/Inventory/5
+        // DELETE: api/BicycleRack/5
         /// <summary>
         /// Deletes existing Inventory entry in database
         /// </summary>
