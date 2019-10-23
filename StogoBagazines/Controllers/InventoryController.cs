@@ -85,11 +85,7 @@ namespace StogoBagazines.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Post([FromBody] InventoryBase value)
         {
-            if (!value.Title.Equals("") && value.Amount >= 0 && value.MonetaryValue > 0)
-            {
-                return Ok(repository.Create(value));
-            }
-            return BadRequest(value);
+            return Ok(repository.Create(value));
         }
 
         // PUT: api/Test/5
@@ -124,7 +120,7 @@ namespace StogoBagazines.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
-            if(repository.Exists(id))
+            if (repository.Exists(id))
             {
                 if (repository.Delete(id))
                 {
