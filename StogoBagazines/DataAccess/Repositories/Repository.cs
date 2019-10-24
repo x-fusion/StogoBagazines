@@ -14,7 +14,6 @@ namespace StogoBagazines.DataAccess.Repositories
         /// Connectivity to database
         /// </summary>
         public Database Database { get; private set; }
-        protected string lastInsertCmd = "SELECT LAST_INSERT_ID();";
         /// <summary>
         /// Repository constructor
         /// </summary>

@@ -13,8 +13,6 @@ namespace StogoBagazines.DataAccess.Repositories
     /// </summary>
     public class BicycleRackRepository : Repository, IRepository<BicycleRack>
     {
-        private string InventoryTable => "Inventory";
-        private string BicycleRackTable => "BicycleRack";
         public BicycleRackRepository(Database database) : base(database)
         {
 
@@ -29,7 +27,7 @@ namespace StogoBagazines.DataAccess.Repositories
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = $"INSERT INTO {InventoryTable}({nameof(InventoryBase.Title)},{nameof(InventoryBase.Amount)},{nameof(InventoryBase.Revenue)}," +
+                CommandText = $"INSERT INTO Inventory({nameof(InventoryBase.Title)},{nameof(InventoryBase.Amount)},{nameof(InventoryBase.Revenue)}," +
                 $"{nameof(InventoryBase.TotalRentDuration)},{nameof(InventoryBase.MonetaryValue)}) VALUES(@{nameof(InventoryBase.Title)},@{nameof(InventoryBase.Amount)}," +
                 $"@{nameof(InventoryBase.Revenue)},@{nameof(InventoryBase.TotalRentDuration)},@{nameof(InventoryBase.MonetaryValue)});"
             };
@@ -46,18 +44,18 @@ namespace StogoBagazines.DataAccess.Repositories
             {
                 if (sqlCommand.ExecuteNonQuery() == 1)
                 {
-                    sqlCommand.CommandText = lastInsertCmd;
+                    sqlCommand.CommandText = "SELECT LAST_INSERT_ID();";
                     insertedObjectId = sqlCommand.ExecuteScalar();
                     sqlCommand = new MySqlCommand
                     {
                         Connection = Database.Connection,
-                        CommandText = $"INSERT INTO {BicycleRackTable}({nameof(BicycleRack.InventoryId)},{nameof(BicycleRack.BikeLimit)}, {nameof(BicycleRack.LiftPower)}," +
+                        CommandText = $"INSERT INTO BicycleRack({nameof(BicycleRack.InventoryId)},{nameof(BicycleRack.BikeLimit)}, {nameof(BicycleRack.LiftPower)}," +
                         $"{nameof(BicycleRack.Assertion)}) VALUES(@{nameof(BicycleRack.InventoryId)},@{nameof(BicycleRack.BikeLimit)},@{nameof(BicycleRack.LiftPower)},@{nameof(BicycleRack.Assertion)});"
                     };
                     sqlCommand.Prepare();
                     if (sqlCommand.ExecuteNonQuery() == 1)
                     {
-                        sqlCommand.CommandText = lastInsertCmd;
+                        sqlCommand.CommandText = "SELECT LAST_INSERT_ID();";
                         insertedObjectId = sqlCommand.ExecuteScalar();
                     }
                     sqlTransaction.Commit();
@@ -90,12 +88,12 @@ namespace StogoBagazines.DataAccess.Repositories
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = $"SELECT {InventoryTable}.{nameof(InventoryBase.Title)}, {InventoryTable}.{nameof(InventoryBase.Amount)}, " +
-                $"{InventoryTable}.{nameof(InventoryBase.Revenue)}, {InventoryTable}.{nameof(InventoryBase.TotalRentDuration)}, {InventoryTable}.{nameof(InventoryBase.MonetaryValue)}, " +
-                $"{BicycleRackTable}.{nameof(BicycleRack.Id)}, {BicycleRackTable}.{nameof(BicycleRack.BikeLimit)}, {BicycleRackTable}.{nameof(BicycleRack.LiftPower)}," +
-                $" {BicycleRackTable}.{nameof(BicycleRack.Assertion)} FROM {InventoryTable} INNER JOIN {BicycleRackTable} ON " +
-                $"{InventoryTable}.{nameof(InventoryBase.Id)} = {BicycleRackTable}.{nameof(BicycleRack.InventoryId)} " +
-                $"WHERE {BicycleRackTable}.{nameof(BicycleRack.Id)} = @Id;"
+                CommandText = $"SELECT Inventory.{nameof(InventoryBase.Title)}, Inventory.{nameof(InventoryBase.Amount)}, " +
+                $"Inventory.{nameof(InventoryBase.Revenue)}, Inventory.{nameof(InventoryBase.TotalRentDuration)}, Inventory.{nameof(InventoryBase.MonetaryValue)}, " +
+                $"BicycleRack.{nameof(BicycleRack.Id)}, BicycleRack.{nameof(BicycleRack.BikeLimit)}, BicycleRack.{nameof(BicycleRack.LiftPower)}," +
+                $" BicycleRack.{nameof(BicycleRack.Assertion)} FROM Inventory INNER JOIN BicycleRack ON " +
+                $"Inventory.{nameof(InventoryBase.Id)} = BicycleRack.{nameof(BicycleRack.InventoryId)} " +
+                $"WHERE BicycleRack.{nameof(BicycleRack.Id)} = @Id;"
             };
             Database.Connection.Open();
             sqlCommand.Prepare();
@@ -105,11 +103,11 @@ namespace StogoBagazines.DataAccess.Repositories
                 using MySqlDataReader reader = sqlCommand.ExecuteReader();
                 if (reader.Read())
                 {
-                    return new BicycleRack(reader.GetInt32($"{BicycleRackTable}.{nameof(BicycleRack.Id)}"), reader.GetString($"{InventoryTable}.{nameof(InventoryBase.Title)}"),
-                        reader.GetInt32($"{InventoryTable}.{nameof(InventoryBase.Amount)}"), reader.GetDecimal($"{InventoryTable}.{nameof(InventoryBase.Revenue)}"),
-                        reader.GetInt32($"{InventoryTable}.{nameof(InventoryBase.TotalRentDuration)}"), reader.GetDecimal($"{InventoryTable}.{nameof(InventoryBase.MonetaryValue)}"),
-                        reader.GetInt32($"{BicycleRackTable}.{nameof(BicycleRack.BikeLimit)}"), reader.GetDouble($"{BicycleRackTable}.{nameof(BicycleRack.LiftPower)}"),
-                        (BicycleRack.AssertionType)Enum.Parse(typeof(BicycleRack.AssertionType), reader.GetString($"{BicycleRackTable}.{nameof(BicycleRack.Assertion)}")));
+                    return new BicycleRack(reader.GetInt32($"BicycleRack.{nameof(BicycleRack.Id)}"), reader.GetString($"Inventory.{nameof(InventoryBase.Title)}"),
+                        reader.GetInt32($"Inventory.{nameof(InventoryBase.Amount)}"), reader.GetDecimal($"Inventory.{nameof(InventoryBase.Revenue)}"),
+                        reader.GetInt32($"Inventory.{nameof(InventoryBase.TotalRentDuration)}"), reader.GetDecimal($"Inventory.{nameof(InventoryBase.MonetaryValue)}"),
+                        reader.GetInt32($"BicycleRack.{nameof(BicycleRack.BikeLimit)}"), reader.GetDouble($"BicycleRack.{nameof(BicycleRack.LiftPower)}"),
+                        (BicycleRack.AssertionType)Enum.Parse(typeof(BicycleRack.AssertionType), reader.GetString($"BicycleRack.{nameof(BicycleRack.Assertion)}")));
                 }
                 return null;
             }

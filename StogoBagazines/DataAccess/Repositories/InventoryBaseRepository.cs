@@ -13,7 +13,6 @@ namespace StogoBagazines.DataAccess.Repositories
     /// </summary>
     public class InventoryBaseRepository : Repository, IRepository<InventoryBase>
     {
-        private string InvetoryBaseTable => "Inventory";
         /// <summary>
         /// Repository constructor
         /// </summary>
@@ -46,7 +45,7 @@ namespace StogoBagazines.DataAccess.Repositories
             {
                 if (sqlCommand.ExecuteNonQuery() == 1)
                 {
-                    sqlCommand.CommandText = lastInsertCmd;
+                    sqlCommand.CommandText = "SELECT LAST_INSERT_ID();";
                     insertedObjectId = sqlCommand.ExecuteScalar();
                     return insertedObjectId;
                 }
