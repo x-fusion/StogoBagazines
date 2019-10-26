@@ -85,7 +85,7 @@ namespace StogoBagazines.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Post([FromBody] InventoryBase value)
         {
-            return Ok(repository.Create(value));
+            return Ok(new KeyValuePair<string, string>("id", repository.Create(value).ToString()));
         }
 
         // PUT: api/Inventory/5

@@ -57,6 +57,7 @@ namespace StogoBagazines.DataAccess.Models
         /// Repository object constructor with custom descriptors
         /// </summary>
         /// <param name="id">Item's identification key in repository</param>
+        /// <param name="id">Item's base object identification key in repository</param>
         /// <param name="title">Tite of item</param>
         /// <param name="amount">Count of items</param>
         /// <param name="totalRevenue">Item's revenue generated during rentals</param>
@@ -65,11 +66,12 @@ namespace StogoBagazines.DataAccess.Models
         /// <param name="limit">Maximum bicycle amount supported</param>
         /// <param name="power">Maximum weight supported</param>
         /// <param name="assertion">Way of how rack can be asserted</param>
-        public BicycleRack(int id, string title, int amount, decimal totalRevenue, int totalRentDuration, decimal value, int limit, double power, AssertionType assertion) : base(id, title, amount, totalRevenue, totalRentDuration, value)
+        public BicycleRack(int id, int inventoryId, string title, int amount, decimal totalRevenue, int totalRentDuration, decimal value, int limit, double power, AssertionType assertion) : base(id, title, amount, totalRevenue, totalRentDuration, value)
         {
             BikeLimit = limit;
             LiftPower = power;
             Assertion = assertion;
+            InventoryId = inventoryId;
         }
         /// <summary>
         /// Custom property and object level validation
@@ -78,19 +80,12 @@ namespace StogoBagazines.DataAccess.Models
         /// <returns>Fields and their's errors</returns>
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            //validacija nenaudoja tevynes klases validacijos??? pvz amount net neirasyta ir nemeta klaidos, reikia pabandyti su tevyne klase
-            var results = new List<ValidationResult>();
+            var results = base.Validate(validationContext).ToList();
             List<string> members = new List<string>();
-            foreach(var type in Enum.GetValues(typeof(AssertionType)))
+            if(LiftPower == 0)
             {
-                if(string.Equals(Assertion.ToString(), type.ToString(), StringComparison.InvariantCultureIgnoreCase))
-                {
-                    break;
-                } else
-                {
-                    members.Add(nameof(Assertion));
-                    results.Add(new ValidationResult("Such assertion type is not allowed", members));
-                }
+                members.Add(nameof(LiftPower));
+                results.Add(new ValidationResult("Lift power cannot be 0", members));
             }
             return results;
         }
