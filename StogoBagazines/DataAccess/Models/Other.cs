@@ -12,6 +12,14 @@ namespace StogoBagazines.DataAccess.Models
     public class Other : InventoryBase, IValidatableObject
     {
         /// <summary>
+        /// Database reference to parent entry
+        /// </summary>
+        public int InventoryId { get; set; }
+        /// <summary>
+        /// Constructor used in serialization
+        /// </summary>
+        public Other() { }
+        /// <summary>
         /// Local custructor
         /// </summary>
         /// <param name="title">Tite of item</param>
@@ -24,13 +32,15 @@ namespace StogoBagazines.DataAccess.Models
         /// Repository object constructor with custom descriptors
         /// </summary>
         /// <param name="id">Item's identification key in repository</param>
+        /// <param name="inventoryId">Item's base object identification key in repository</param>
         /// <param name="title">Tite of item</param>
         /// <param name="amount">Count of items</param>
         /// <param name="totalRevenue">Item's revenue generated during rentals</param>
         /// <param name="totalRentDuration">Item's days spent at rent</param>
         /// <param name="value">Monetary value of item</param>
-        public Other(int id, string title, int amount, decimal totalRevenue, int totalRentDuration, decimal value) : base(id, title, amount, totalRevenue, totalRentDuration, value)
+        public Other(int id, int inventoryId, string title, int amount, decimal totalRevenue, int totalRentDuration, decimal value) : base(id, title, amount, totalRevenue, totalRentDuration, value)
         {
+            InventoryId = inventoryId;
         }
         /// <summary>
         /// Custom property and object level validation
