@@ -57,7 +57,7 @@ namespace StogoBagazines.DataAccess.Models
         /// Repository object constructor with custom descriptors
         /// </summary>
         /// <param name="id">Item's identification key in repository</param>
-        /// <param name="id">Item's base object identification key in repository</param>
+        /// <param name="inventoryId">Item's base object identification key in repository</param>
         /// <param name="title">Tite of item</param>
         /// <param name="amount">Count of items</param>
         /// <param name="totalRevenue">Item's revenue generated during rentals</param>
