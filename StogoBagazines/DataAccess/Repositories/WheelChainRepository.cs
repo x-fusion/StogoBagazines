@@ -151,12 +151,19 @@ namespace StogoBagazines.DataAccess.Repositories
                 using MySqlDataReader reader = sqlCommand.ExecuteReader();
                 if (reader.Read())
                 {
-                    return new WheelChain(reader.GetInt32($"{nameof(WheelChain.Id)}"), reader.GetInt32($"{nameof(WheelChain.InventoryId)}"),
-                        reader.GetString($"{nameof(WheelChain.Title)}"),
-                        reader.GetInt32($"{nameof(WheelChain.Amount)}"), reader.GetDecimal($"{nameof(WheelChain.Revenue)}"),
-                        reader.GetInt32($"{nameof(WheelChain.TotalRentDuration)}"), reader.GetDecimal($"{nameof(WheelChain.MonetaryValue)}"),
-                        reader.GetString($"{nameof(WheelChain.TireDimensions)}"), reader.GetDouble($"{nameof(WheelChain.ChainThickness)}"),
-                        (WheelChain.VehicleType)Enum.Parse(typeof(WheelChain.VehicleType), reader.GetString($"{nameof(WheelChain.Type)}")));
+                    return new WheelChain
+                    {
+                        InventoryId = reader.GetInt32($"{nameof(WheelChain.InventoryId)}"),
+                        Id = reader.GetInt32($"{nameof(WheelChain.Id)}"),
+                        Title = reader.GetString($"{nameof(WheelChain.Title)}"),
+                        Amount = reader.GetInt32($"{nameof(WheelChain.Amount)}"),
+                        Revenue = reader.GetDecimal($"{nameof(WheelChain.Revenue)}"),
+                        TotalRentDuration = reader.GetInt32($"{nameof(WheelChain.TotalRentDuration)}"),
+                        MonetaryValue = reader.GetDecimal($"{nameof(WheelChain.MonetaryValue)}"),
+                        TireDimensions = reader[$"{nameof(RoofRack.AppearenceDescription)}"] is DBNull ? string.Empty : reader.GetString($"{nameof(WheelChain.TireDimensions)}"),
+                        ChainThickness = reader.GetDouble($"{nameof(WheelChain.ChainThickness)}"),
+                        Type = (WheelChain.VehicleType)Enum.Parse(typeof(WheelChain.VehicleType), reader.GetString($"{nameof(WheelChain.Type)}"))
+                    };
                 }
                 return null;
             }
@@ -195,7 +202,7 @@ namespace StogoBagazines.DataAccess.Repositories
                         Revenue = reader.GetDecimal($"{nameof(WheelChain.Revenue)}"),
                         TotalRentDuration = reader.GetInt32($"{nameof(WheelChain.TotalRentDuration)}"),
                         MonetaryValue = reader.GetDecimal($"{nameof(WheelChain.MonetaryValue)}"),
-                        TireDimensions = reader.GetString($"{nameof(WheelChain.TireDimensions)}"),
+                        TireDimensions = reader[$"{nameof(RoofRack.AppearenceDescription)}"] is DBNull ? string.Empty : reader.GetString($"{nameof(WheelChain.TireDimensions)}"),
                         ChainThickness = reader.GetDouble($"{nameof(WheelChain.ChainThickness)}"),
                         Type = (WheelChain.VehicleType)Enum.Parse(typeof(WheelChain.VehicleType), reader.GetString($"{nameof(WheelChain.Type)}"))
                     });

@@ -45,6 +45,10 @@ namespace StogoBagazines.DataAccess.Models
         [DataType(DataType.Text, ErrorMessage = "Invalid Appearence description provided")]
         public string AppearenceDescription { get; set; }
         /// <summary>
+        /// Constructor used in serialization
+        /// </summary>
+        public RoofRack() { }
+        /// <summary>
         /// Local custructor with custom descriptors
         /// </summary>
         /// <param name="title">Tite of item</param>
