@@ -19,11 +19,6 @@ namespace StogoBagazines.Controllers
         /// Logging object
         /// </summary>
         private readonly ILogger<BicycleRackController> logger;
-        /// <summary>
-        /// Database object
-        /// </summary>
-        private readonly Database database;
-        /// <summary>
         /// Repository object
         /// </summary>
         private readonly BicycleRackRepository repository;
@@ -35,7 +30,6 @@ namespace StogoBagazines.Controllers
         public BicycleRackController(ILogger<BicycleRackController> logger, Database database)
         {
             this.logger = logger;
-            this.database = database;
             repository = new BicycleRackRepository(database);
         }
         // GET: api/BicycleRack

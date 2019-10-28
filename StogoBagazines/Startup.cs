@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
+using Microsoft.OpenApi.Models;
 
 namespace StogoBagazines
 {
@@ -30,7 +31,7 @@ namespace StogoBagazines
         public void ConfigureServices(IServiceCollection services)
         {
             Configuration.JwtOptions jwtOptions = new Configuration.JwtOptions();
-            Configuration.GetSection(nameof(StogoBagazines.Configuration.SwaggerOptions)).Bind(jwtOptions);
+            Configuration.GetSection(nameof(StogoBagazines.Configuration.JwtOptions)).Bind(jwtOptions);
 
             services.AddAuthentication(x =>
             {
@@ -53,29 +54,34 @@ namespace StogoBagazines
             services.AddControllers();
             services.AddMvcCore().AddApiExplorer();
             services.AddTransient(_ => new DataAccess.Database(Configuration.GetConnectionString("MySQLDb")));
+            services.AddTransient(_ => jwtOptions);
             services.AddSwaggerGen(x =>
             {
-                x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo()
+                x.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "StogoBagazines WebAPI documentation",
                     Version = "v1",
-                    Contact = new Microsoft.OpenApi.Models.OpenApiContact()
+                    Contact = new OpenApiContact
                     {
                         Email = "edvardas.alaburda@ktu.edu",
                         Name = "Edvardas-Arnoldas Alaburda",
                         Url = new Uri("https://github.com/x-fusion")
                     }
                 });
-                x.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
+                x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "JWT Authorization header using the Bearer scheme",
                     Name = "Authorization",
-                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
                 });
-                x.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
+                x.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    
+                    {new OpenApiSecurityScheme{Reference = new OpenApiReference
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme
+                    }}, new List<string>()}
                 });
             });
         }
