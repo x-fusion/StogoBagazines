@@ -88,6 +88,7 @@ namespace StogoBagazines.Services
                     AES.IV = key.GetBytes(AES.BlockSize / 8);
 
                     AES.Mode = CipherMode.CBC;
+                    AES.Padding = PaddingMode.PKCS7;
 
                     using (var cs = new CryptoStream(ms, AES.CreateEncryptor(), CryptoStreamMode.Write))
                     {
@@ -121,6 +122,7 @@ namespace StogoBagazines.Services
                     AES.Key = key.GetBytes(AES.KeySize / 8);
                     AES.IV = key.GetBytes(AES.BlockSize / 8);
                     AES.Mode = CipherMode.CBC;
+                    AES.Padding = PaddingMode.PKCS7;
 
                     using (var cs = new CryptoStream(ms, AES.CreateDecryptor(), CryptoStreamMode.Write))
                     {
