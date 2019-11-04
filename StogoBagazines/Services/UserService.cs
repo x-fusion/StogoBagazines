@@ -9,6 +9,10 @@ using StogoBagazines.DataAccess.Interfaces;
 using StogoBagazines.DataAccess;
 using StogoBagazines.DataAccess.Repositories;
 using MySql.Data.MySqlClient;
+using StogoBagazines.ApiRequests;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace StogoBagazines.Services
 {
@@ -19,6 +23,7 @@ namespace StogoBagazines.Services
     public class UserService : Repository, IUserService, IRepository<User>
     {
         private readonly JwtOptions jwtOptions;
+        private readonly TokenValidationParameters tokenValidationParameters;
 
         public UserService(JwtOptions jwtOptions, Database database) : base(database)
         {
@@ -268,6 +273,44 @@ namespace StogoBagazines.Services
                 sqlTransaction.Rollback();
             }
             return false;
+        }
+        public AuthResponse RefreshToken(string token, string refreshToken)
+        {
+            var validatedToken = GetPrincipalFromToken(token);
+
+            if(validatedToken == null)
+            {
+                return new AuthResponse
+                {
+                    Message = "Invalid token"
+                };
+            }
+
+            var expirationDate = long.Parse(validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+
+        }
+
+        private ClaimsPrincipal GetPrincipalFromToken(string token)
+        {
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var validatedToken);
+                if(!IsJwtWithValidSecurityAlgorithm(validatedToken))
+                {
+                    return null;
+                }
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
+        {
+            return (validatedToken is JwtSecurityToken jwtSecurityToken) && jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

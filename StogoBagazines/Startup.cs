@@ -30,8 +30,18 @@ namespace StogoBagazines
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            DataAccess.Database database = new DataAccess.Database(Configuration.GetConnectionString("MySQLDb"));
             Configuration.JwtOptions jwtOptions = new Configuration.JwtOptions();
             Configuration.GetSection(nameof(StogoBagazines.Configuration.JwtOptions)).Bind(jwtOptions);
+            TokenValidationParameters tokenValidation = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions.Secret)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                RequireExpirationTime = false,
+                ValidateLifetime = true
+            };
 
             services.AddAuthentication(x =>
             {
@@ -41,20 +51,14 @@ namespace StogoBagazines
             }).AddJwtBearer(token =>
             {
                 token.SaveToken = true;
-                token.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions.Secret)),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    RequireExpirationTime = false,
-                    ValidateLifetime = true
-                };
+                token.TokenValidationParameters = tokenValidation;
             });
             services.AddControllers();
             services.AddMvcCore().AddApiExplorer();
-            services.AddTransient(_ => new DataAccess.Database(Configuration.GetConnectionString("MySQLDb")));
-            services.AddTransient(_ => jwtOptions);
+            services.AddSingleton(database);
+            services.AddSingleton(jwtOptions);
+            services.AddSingleton(tokenValidation);
+
             services.AddSwaggerGen(x =>
             {
                 x.SwaggerDoc("v1", new OpenApiInfo

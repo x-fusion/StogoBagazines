@@ -36,7 +36,8 @@ namespace StogoBagazines.Controllers
         /// <summary>
         /// User service object
         /// </summary>
-        private readonly UserService service;
+        private readonly UserService userService;
+        private readonly RefreshTokenService tokenService;
         /// <summary>
         /// Jwt Settings
         /// </summary>
@@ -49,7 +50,8 @@ namespace StogoBagazines.Controllers
         /// <param name="database">Dependency injection database object</param>
         public UsersController(ILogger<UsersController> logger, JwtOptions jwtOptions, Database database)
         {
-            service = new UserService(jwtOptions, database);
+            userService = new UserService(jwtOptions, database);
+            tokenService = new RefreshTokenService(database);
             this.logger = logger;
             this.database = database;
             this.jwtOptions = jwtOptions;
@@ -59,7 +61,7 @@ namespace StogoBagazines.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthenticateRequest request)
         {
-            User user = service.Authetificate(request.Email, request.Password);
+            User user = userService.Authetificate(request.Email, request.Password);
             if (user == null)
             {
                 return BadRequest(new { message = "Provided credentials are incorrect!" });
@@ -75,7 +77,7 @@ namespace StogoBagazines.Controllers
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
                     new Claim("id", user.Id.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(2),
+                Expires = DateTime.UtcNow.Add(jwtOptions.TokenLifetime),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -84,7 +86,8 @@ namespace StogoBagazines.Controllers
             return Ok(new AuthResponse
             {
                 Message = "Authentificated",
-                Token = tokenHandler.WriteToken(token)
+                Token = tokenHandler.WriteToken(token),
+                RefreshToken = 
             });
         }
 
@@ -92,12 +95,12 @@ namespace StogoBagazines.Controllers
         [HttpPost("register")]
         public IActionResult Create([FromBody]User user)
         {
-            if (service.Exists(user.Email))
+            if (userService.Exists(user.Email))
             {
                 return BadRequest(new Response { Message = "Such email is already registered" });
             }
             user.Role = Role.User;
-            if(service.Create(user) != (object)-1)
+            if(userService.Create(user) != (object)-1)
             {
                 return Ok(new Response { Message = "User was successfully created" });
             }
@@ -109,12 +112,47 @@ namespace StogoBagazines.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public ActionResult<IEnumerable<User>> Get()
         {
-            List<User> users = service.ReadAll().ToList();
+            List<User> users = userService.ReadAll().ToList();
             if (users.Count > 0)
             {
                 return Ok(users);
             }
             return NoContent();
+        }
+
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public IActionResult Refresh([FromBody]RefreshTokenRequest request)
+        {
+            User user = userService.RefreshToken(request.Email, request.Password);
+            if (user == null)
+            {
+                return BadRequest(new { message = "Provided credentials are incorrect!" });
+            }
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(jwtOptions.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim("id", user.Id.ToString())
+                }),
+                Expires = DateTime.UtcNow.Add(jwtOptions.TokenLifetime),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return Ok(new AuthResponse
+            {
+                Message = "Authentificated",
+                Token = tokenHandler.WriteToken(token),
+                RefreshToken =
+            });
         }
     }
 }
