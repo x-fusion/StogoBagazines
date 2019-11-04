@@ -33,7 +33,7 @@ namespace StogoBagazines.Services
                 Connection = Database.Connection,
                 CommandText = $"SELECT User.{nameof(User.Id)},User.{nameof(User.FirstName)},User.{nameof(User.LastName)}," +
                 $"User.{nameof(User.Email)},User.{nameof(User.Role)} FROM User " +
-                $"WHERE User.{nameof(User.Email)} = @{nameof(User.Email)} AND User.{nameof(User.Password)} = @{nameof(User.Password)};"
+                $"WHERE User.{nameof(User.Email)} = @{nameof(User.Email)} AND User.`{nameof(User.Password)}` = @{nameof(User.Password)};"
             };
             Database.Connection.Open();
             sqlCommand.Prepare();
@@ -65,7 +65,7 @@ namespace StogoBagazines.Services
             {
                 Connection = Database.Connection,
                 CommandText = $"INSERT INTO User({nameof(User.FirstName)},{nameof(User.LastName)},{nameof(User.Email)}," +
-                $"{nameof(User.Password)},{nameof(User.Role)} VALUES(@{nameof(User.FirstName)},@{nameof(User.LastName)}," +
+                $"`{nameof(User.Password)}`,{nameof(User.Role)}) VALUES(@{nameof(User.FirstName)},@{nameof(User.LastName)}," +
                 $"@{nameof(User.Email)},@{nameof(User.Password)},@{nameof(User.Role)});"
             };
             Database.Connection.Open();
@@ -135,7 +135,7 @@ namespace StogoBagazines.Services
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = "SELECT * FROM Inventory WHERE Email=@Email;"
+                CommandText = "SELECT * FROM User WHERE Email=@Email;"
             };
             Database.Connection.Open();
             sqlCommand.Prepare();
@@ -246,7 +246,7 @@ namespace StogoBagazines.Services
             {
                 Connection = Database.Connection,
                 CommandText = $"UPDATE User SET {nameof(User.FirstName)}=@{nameof(User.LastName)},{nameof(User.LastName)}," +
-                $"{nameof(User.Email)}=@{nameof(User.Email)},{nameof(User.Password)}=@{nameof(User.Password)}," +
+                $"{nameof(User.Email)}=@{nameof(User.Email)},`{nameof(User.Password)}`=@{nameof(User.Password)}," +
                 $"{nameof(User.Role)}=@{nameof(User.Role)} WHERE {nameof(User.Id)}=@{nameof(User.Id)}"
             };
             Database.Connection.Open();

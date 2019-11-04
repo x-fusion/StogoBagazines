@@ -96,10 +96,14 @@ namespace StogoBagazines.Controllers
             {
                 return BadRequest(new Response { Message = "Such email is already registered" });
             }
-            return Ok(new Response { Message = "User was successfully created" });
+            user.Role = Role.User;
+            if(service.Create(user) != (object)-1)
+            {
+                return Ok(new Response { Message = "User was successfully created" });
+            }
+            return BadRequest(new Response { Message = "Registration couldn't complete, try again." });
         }
 
-        [Authorize(Roles = Role.SysAdmin)]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

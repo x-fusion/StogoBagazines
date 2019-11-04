@@ -8,9 +8,12 @@ using Microsoft.Extensions.Logging;
 using StogoBagazines.DataAccess;
 using StogoBagazines.DataAccess.Repositories;
 using StogoBagazines.DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace StogoBagazines.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class InventoryController : ControllerBase
@@ -46,6 +49,7 @@ namespace StogoBagazines.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult<IEnumerable<InventoryBase>> Get()
         {
             List<InventoryBase> results = repository.ReadAll().ToList();
@@ -65,6 +69,7 @@ namespace StogoBagazines.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult<InventoryBase> Get(int id)
         {
             InventoryBase result = repository.Read(id);
@@ -83,6 +88,7 @@ namespace StogoBagazines.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Post([FromBody] InventoryBase value)
         {
             return Ok(new KeyValuePair<string, string>("id", repository.Create(value).ToString()));
@@ -98,6 +104,7 @@ namespace StogoBagazines.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Put(int id, [FromBody] InventoryBase value)
         {
             if (repository.Exists(id))
@@ -118,6 +125,7 @@ namespace StogoBagazines.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Delete(int id)
         {
             if (repository.Exists(id))

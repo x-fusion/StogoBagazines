@@ -8,9 +8,12 @@ using Microsoft.Extensions.Logging;
 using StogoBagazines.DataAccess;
 using StogoBagazines.DataAccess.Repositories;
 using StogoBagazines.DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace StogoBagazines.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class OtherController : ControllerBase

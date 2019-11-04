@@ -21,7 +21,7 @@ namespace StogoBagazines.DataAccess.Models
         [StringLength(255, ErrorMessage = "Length cannot exceed 45 characters")]
         [DataType(DataType.EmailAddress, ErrorMessage = "Invalid Email provided")]
         public string Email { get; set; }
-        [field: NonSerialized]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
         [DataType(DataType.Text)]
         public string Role { get; set; }
