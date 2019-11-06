@@ -24,10 +24,12 @@ namespace StogoBagazines.Services
     {
         private readonly JwtOptions jwtOptions;
         private readonly TokenValidationParameters tokenValidationParameters;
+        private readonly RefreshTokenService refreshTokenService;
 
         public UserService(JwtOptions jwtOptions, Database database) : base(database)
         {
             this.jwtOptions = jwtOptions;
+            refreshTokenService = new RefreshTokenService(database);
         }
 
         public User Authetificate(string email, string password)
@@ -277,8 +279,8 @@ namespace StogoBagazines.Services
         public AuthResponse RefreshToken(string token, string refreshToken)
         {
             var validatedToken = GetPrincipalFromToken(token);
-
-            if(validatedToken == null)
+            var 
+            if (validatedToken == null)
             {
                 return new AuthResponse
                 {
@@ -287,7 +289,37 @@ namespace StogoBagazines.Services
             }
 
             var expirationDate = long.Parse(validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+            DateTime expirationDateUtc = new DateTime(DateTime.UnixEpoch.Ticks, DateTimeKind.Utc).AddSeconds(expirationDate).Subtract(jwtOptions.TokenLifetime);
 
+            if (expirationDateUtc > DateTime.UtcNow)
+            {
+                return new AuthResponse
+                {
+                    Message = "This token hasn't expired yet."
+                };
+            }
+            string jti = validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+            var storedRefreshToken = refreshTokenService.Read(jti);
+            if (storedRefreshToken == null)
+            {
+                return new AuthResponse
+                { Message = "This refresh token doesn't exist" };
+            }
+            if(DateTime.UtcNow > storedRefreshToken.ExpirationDate)
+            {
+                return new AuthResponse
+                { Message = "This refresh token has expired" };
+            }
+            if(storedRefreshToken.Invalidated)
+            {
+                return new AuthResponse
+                { Message = "This refresh token has been invalidated" };
+            }
+            if(storedRefreshToken.Used)
+            {
+                return new AuthResponse
+                { Message = "This refresh token has been used already" };
+            }
         }
 
         private ClaimsPrincipal GetPrincipalFromToken(string token)
@@ -296,8 +328,10 @@ namespace StogoBagazines.Services
 
             try
             {
+                var tokenValidationParameters = this.tokenValidationParameters.Clone();
+                tokenValidationParameters.ValidateLifetime = false;
                 var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var validatedToken);
-                if(!IsJwtWithValidSecurityAlgorithm(validatedToken))
+                if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
                 {
                     return null;
                 }

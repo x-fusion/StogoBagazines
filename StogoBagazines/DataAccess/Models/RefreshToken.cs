@@ -13,6 +13,7 @@ namespace StogoBagazines.DataAccess.Models
         public DateTime ExpirationDate { get; set; }
         public bool Used { get; set; }
         public bool Invalidated { get; set; }
+        public string Token { get; set; }
         public int UserId { get; set; }
 
         public RefreshToken()
