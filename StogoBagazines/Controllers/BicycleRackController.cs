@@ -75,7 +75,8 @@ namespace StogoBagazines.Controllers
             }
             return NotFound(new Response
             {
-                Message = $"Object with {id} doesn't exist"
+                Message = $"Object doesn't exist",
+                Payload = id
             });
         }
 
@@ -125,7 +126,8 @@ namespace StogoBagazines.Controllers
             }
             return NotFound(new Response
             {
-                Message = $"Object with {id} doesn't exist"
+                Message = $"Object doesn't exist",
+                Payload = id
             });
         }
 
@@ -146,13 +148,15 @@ namespace StogoBagazines.Controllers
                 {
                     return Ok(new Response
                     {
-                        Message = "Succesfully deleted"
+                        Message = "Succesfully deleted",
+                        Payload = id
                     });
                 }
             }
             return NotFound(new Response
             {
-                Message = $"Object with {id} doesn't exist"
+                Message = $"Object doesn't exist",
+                Payload = id
             });
         }
     }

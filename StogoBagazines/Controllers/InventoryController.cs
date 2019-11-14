@@ -10,6 +10,7 @@ using StogoBagazines.DataAccess.Repositories;
 using StogoBagazines.DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using StogoBagazines.ApiRequests;
 
 namespace StogoBagazines.Controllers
 {
@@ -77,7 +78,11 @@ namespace StogoBagazines.Controllers
             {
                 return Ok(result);
             }
-            return NotFound(new KeyValuePair<string, int>("id", id));
+            return NotFound(new Response
+            {
+                Message = $"Object doesn't exist",
+                Payload = id
+            });
         }
 
         // POST: api/Inventory
@@ -91,7 +96,13 @@ namespace StogoBagazines.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Post([FromBody] InventoryBase value)
         {
-            return Ok(new KeyValuePair<string, string>("id", repository.Create(value).ToString()));
+            object id = repository.Create(value);
+            value.Id = int.Parse(id.ToString());
+            return Ok(new Response
+            {
+                Message = "Succesfully submitted",
+                Payload = value
+            });
         }
 
         // PUT: api/Inventory/5
@@ -103,18 +114,26 @@ namespace StogoBagazines.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Put(int id, [FromBody] InventoryBase value)
         {
             if (repository.Exists(id))
             {
                 if (repository.Update(id, value))
                 {
-                    return Ok();
+                    return Ok(new Response
+                    {
+                        Message = "Succesfully updated",
+                        Payload = value
+                    });
                 }
             }
-            return NotFound(new KeyValuePair<string, int>("id", id));
+            return NotFound(new Response
+            {
+                Message = $"Object doesn't exist",
+                Payload = id
+            });
         }
 
         // DELETE: api/Inventory/5
@@ -124,18 +143,26 @@ namespace StogoBagazines.Controllers
         /// <param name="id">Inventory entry to be deleted reference</param>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
             if (repository.Exists(id))
             {
                 if (repository.Delete(id))
                 {
-                    return Ok();
+                    return Ok(new Response
+                    {
+                        Message = "Succesfully deleted",
+                        Payload = id
+                    });
                 }
             }
-            return NotFound(new KeyValuePair<string, int>("id", id));
+            return NotFound(new Response
+            {
+                Message = $"Object doesn't exist",
+                Payload = id
+            });
         }
     }
 }

@@ -59,18 +59,25 @@ namespace StogoBagazines.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Authenticate([FromBody]AuthenticateRequest request)
         {
             User user = userService.Authetificate(request.Email, request.Password);
             if (user == null)
             {
-                return BadRequest(new { message = "Provided credentials are incorrect!" });
+                return BadRequest(new AuthResponse
+                {
+                    Message = "Provided credentials were incorrect!"
+                });
             }
             return Ok(userService.GenerateAuthentificationResultForUser(user));
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Create([FromBody]User user)
         {
             if (userService.Exists(user.Email))
@@ -78,16 +85,25 @@ namespace StogoBagazines.Controllers
                 return BadRequest(new Response { Message = "Such email is already registered" });
             }
             user.Role = Role.User;
-            if(userService.Create(user) != (object)-1)
+            object id = userService.Create(user);
+            if (id != (object)-1)
             {
-                return Ok(new Response { Message = "User was successfully created" });
+                return Ok(new Response { 
+                    Message = "User was successfully created",
+                    Payload = id
+                });
             }
-            return BadRequest(new Response { Message = "Registration couldn't complete, try again." });
+            return BadRequest(new Response { 
+                Message = "Registration couldn't succeed...",
+                Payload = user
+            });
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize(Roles = "SysAdmin")]
         public ActionResult<IEnumerable<User>> Get()
         {
             List<User> users = userService.ReadAll().ToList();
@@ -100,9 +116,15 @@ namespace StogoBagazines.Controllers
 
         [AllowAnonymous]
         [HttpPost("refesh")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Refresh([FromBody]RefreshTokenRequest request)
         {
             AuthResponse response = userService.RefreshToken(request.Token, request.RefreshToken);
+            if(response.Message != "Authenticated")
+            {
+                return BadRequest(response);
+            }
             return Ok(response);
         }
     }

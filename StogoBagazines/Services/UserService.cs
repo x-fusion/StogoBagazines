@@ -285,7 +285,8 @@ namespace StogoBagazines.Services
             {
                 return new AuthResponse
                 {
-                    Message = "Invalid token"
+                    Message = "Invalid token",
+                    Payload = token
                 };
             }
 
@@ -296,7 +297,8 @@ namespace StogoBagazines.Services
             {
                 return new AuthResponse
                 {
-                    Message = "This token hasn't expired yet."
+                    Message = "This token hasn't expired yet.",
+                    Payload = expirationDate
                 };
             }
             string jti = validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
@@ -304,33 +306,48 @@ namespace StogoBagazines.Services
             if (storedRefreshToken == null)
             {
                 return new AuthResponse
-                { Message = "This refresh token doesn't exist" };
+                {
+                    Message = "This refresh token doesn't exist",
+                    Payload = refreshToken
+                };
             }
-            if(DateTime.UtcNow > storedRefreshToken.ExpirationDate)
+            if (DateTime.UtcNow > storedRefreshToken.ExpirationDate)
             {
                 return new AuthResponse
-                { Message = "This refresh token has expired" };
+                {
+                    Message = "This refresh token has expired",
+                    Payload = storedRefreshToken.ExpirationDate
+                };
             }
-            if(storedRefreshToken.Invalidated)
+            if (storedRefreshToken.Invalidated)
             {
                 return new AuthResponse
-                { Message = "This refresh token has been invalidated" };
+                {
+                    Message = "This refresh token has been invalidated",
+                    Payload = storedRefreshToken
+                };
             }
-            if(storedRefreshToken.Used)
+            if (storedRefreshToken.Used)
             {
                 return new AuthResponse
-                { Message = "This refresh token has been used already" };
+                {
+                    Message = "This refresh token has been used already",
+                    Payload = storedRefreshToken
+                };
             }
-            if(storedRefreshToken.JwtId != jti)
+            if (storedRefreshToken.JwtId != jti)
             {
                 return new AuthResponse
-                { Message = "This refresh token doesn't match this Jwt" };
+                {
+                    Message = "This refresh token doesn't match this Jwt",
+                    Payload = storedRefreshToken.JwtId
+                };
             }
 
             storedRefreshToken.Used = true;
             User user = Read((object)validatedToken.Claims.Single(x => x.Type == "id").Value);
             refreshTokenService.Update(storedRefreshToken.Id, storedRefreshToken);
-            
+
             return GenerateAuthentificationResultForUser(user);
         }
         public AuthResponse GenerateAuthentificationResultForUser(User user)
