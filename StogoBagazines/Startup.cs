@@ -40,7 +40,8 @@ namespace StogoBagazines
                 ValidateIssuer = false,
                 ValidateAudience = false,
                 RequireExpirationTime = false,
-                ValidateLifetime = true
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
             };
 
             services.AddAuthentication(x =>
