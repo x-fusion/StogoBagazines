@@ -21,7 +21,7 @@ namespace StogoBagazines.Services
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = $"INSERT INTO RefreshToken({nameof(RefreshToken.JwtId)},{nameof(RefreshToken.CreationDate)},{nameof(RefreshToken.ExpirationDate)},{nameof(RefreshToken.Used)}," +
+                CommandText = $"INSERT INTO {nameof(RefreshToken)}({nameof(RefreshToken.JwtId)},{nameof(RefreshToken.CreationDate)},{nameof(RefreshToken.ExpirationDate)},{nameof(RefreshToken.Used)}," +
                 $"{nameof(RefreshToken.Invalidated)},{nameof(RefreshToken.Token)},{nameof(RefreshToken.UserId)}) VALUES(@{nameof(RefreshToken.JwtId)},@{nameof(RefreshToken.CreationDate)},@{nameof(RefreshToken.ExpirationDate)}," +
                 $"@{nameof(RefreshToken.Used)},@{nameof(RefreshToken.Invalidated)},@{nameof(RefreshToken.Token)},@{nameof(RefreshToken.UserId)});"
             };
@@ -55,7 +55,7 @@ namespace StogoBagazines.Services
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = $"DELETE FROM RefreshToken WHERE {nameof(RefreshToken.Id)}=@{nameof(RefreshToken.Id)};"
+                CommandText = $"DELETE FROM {nameof(RefreshToken)} WHERE {nameof(RefreshToken.Id)}=@{nameof(RefreshToken.Id)};"
             };
             Database.Connection.Open();
             sqlCommand.Prepare();
@@ -78,7 +78,7 @@ namespace StogoBagazines.Services
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = $"SELECT * FROM RefreshToken WHERE {nameof(RefreshToken.Id)}=@{nameof(RefreshToken.Id)};"
+                CommandText = $"SELECT * FROM {nameof(RefreshToken)} WHERE {nameof(RefreshToken.Id)}=@{nameof(RefreshToken.Id)};"
             };
             Database.Connection.Open();
             sqlCommand.Prepare();
@@ -99,11 +99,11 @@ namespace StogoBagazines.Services
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = $"SELECT RefreshToken.{nameof(RefreshToken.Id)}, RefreshToken.{nameof(RefreshToken.JwtId)}, " +
-                $"RefreshToken.{nameof(RefreshToken.CreationDate)}, RefreshToken.{nameof(RefreshToken.ExpirationDate)}, " +
-                $"RefreshToken.{nameof(RefreshToken.Used)}, RefreshToken.{nameof(RefreshToken.Invalidated)}, " +
-                $"RefreshToken.{nameof(RefreshToken.Token)}, RefreshToken.{nameof(RefreshToken.UserId)} " +
-                $"FROM RefreshToken WHERE RefreshToken.{nameof(RefreshToken.Id)} = @{nameof(RefreshToken.Id)};"
+                CommandText = $"SELECT {nameof(RefreshToken)}.{nameof(RefreshToken.Id)}, {nameof(RefreshToken)}.{nameof(RefreshToken.JwtId)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.CreationDate)}, {nameof(RefreshToken)}.{nameof(RefreshToken.ExpirationDate)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.Used)}, {nameof(RefreshToken)}.{nameof(RefreshToken.Invalidated)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.Token)}, {nameof(RefreshToken)}.{nameof(RefreshToken.UserId)} " +
+                $"FROM {nameof(RefreshToken)} WHERE {nameof(RefreshToken)}.{nameof(RefreshToken.Id)} = @{nameof(RefreshToken.Id)};"
             };
             Database.Connection.Open();
             sqlCommand.Prepare();
@@ -134,11 +134,11 @@ namespace StogoBagazines.Services
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = $"SELECT RefreshToken.{nameof(RefreshToken.Id)}, RefreshToken.{nameof(RefreshToken.JwtId)}, " +
-                $"RefreshToken.{nameof(RefreshToken.CreationDate)}, RefreshToken.{nameof(RefreshToken.ExpirationDate)}, " +
-                $"RefreshToken.{nameof(RefreshToken.Used)}, RefreshToken.{nameof(RefreshToken.Invalidated)}, " +
-                $"RefreshToken.{nameof(RefreshToken.Token)}, RefreshToken.{nameof(RefreshToken.UserId)} " +
-                $"FROM RefreshToken WHERE RefreshToken.{nameof(RefreshToken.UserId)} = @{nameof(RefreshToken.UserId)};"
+                CommandText = $"SELECT {nameof(RefreshToken)}.{nameof(RefreshToken.Id)}, {nameof(RefreshToken)}.{nameof(RefreshToken.JwtId)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.CreationDate)}, {nameof(RefreshToken)}.{nameof(RefreshToken.ExpirationDate)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.Used)}, {nameof(RefreshToken)}.{nameof(RefreshToken.Invalidated)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.Token)}, {nameof(RefreshToken)}.{nameof(RefreshToken.UserId)} " +
+                $"FROM {nameof(RefreshToken)} WHERE {nameof(RefreshToken)}.{nameof(RefreshToken.UserId)} = @{nameof(RefreshToken.UserId)};"
             };
             Database.Connection.Open();
             sqlCommand.Prepare();
@@ -164,20 +164,20 @@ namespace StogoBagazines.Services
             }
         }
 
-        public RefreshToken Read(string jti)
+        public RefreshToken Read(string token)
         {
             MySqlCommand sqlCommand = new MySqlCommand
             {
                 Connection = Database.Connection,
-                CommandText = $"SELECT RefreshToken.{nameof(RefreshToken.Id)}, RefreshToken.{nameof(RefreshToken.JwtId)}, " +
-                $"RefreshToken.{nameof(RefreshToken.CreationDate)}, RefreshToken.{nameof(RefreshToken.ExpirationDate)}, " +
-                $"RefreshToken.{nameof(RefreshToken.Used)}, RefreshToken.{nameof(RefreshToken.Invalidated)}, " +
-                $"RefreshToken.{nameof(RefreshToken.Token)}, RefreshToken.{nameof(RefreshToken.UserId)} " +
-                $"FROM RefreshToken WHERE RefreshToken.{nameof(RefreshToken.JwtId)} = @JwtId;"
+                CommandText = $"SELECT {nameof(RefreshToken)}.{nameof(RefreshToken.Id)}, {nameof(RefreshToken)}.{nameof(RefreshToken.JwtId)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.CreationDate)}, {nameof(RefreshToken)}.{nameof(RefreshToken.ExpirationDate)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.Used)}, {nameof(RefreshToken)}.{nameof(RefreshToken.Invalidated)}, " +
+                $"{nameof(RefreshToken)}.{nameof(RefreshToken.Token)}, {nameof(RefreshToken)}.{nameof(RefreshToken.UserId)} " +
+                $"FROM {nameof(RefreshToken)} WHERE {nameof(RefreshToken)}.{nameof(RefreshToken.Token)} = @{nameof(RefreshToken.Token)};"
             };
             Database.Connection.Open();
             sqlCommand.Prepare();
-            sqlCommand.Parameters.AddWithValue($"@{nameof(RefreshToken.JwtId)}", jti);
+            sqlCommand.Parameters.AddWithValue($"@{nameof(RefreshToken.Token)}", token);
             using (Database.Connection)
             {
                 using MySqlDataReader reader = sqlCommand.ExecuteReader();
@@ -236,7 +236,7 @@ namespace StogoBagazines.Services
             {
                 Connection = Database.Connection,
                 CommandText = $"UPDATE {nameof(RefreshToken)} SET {nameof(RefreshToken.JwtId)}=@{nameof(RefreshToken.JwtId)},{nameof(RefreshToken.CreationDate)}=@{nameof(RefreshToken.CreationDate)}," +
-                $"{nameof(RefreshToken.ExpirationDate)}=@{nameof(RefreshToken.ExpirationDate)},{nameof(RefreshToken.Used)}=@{nameof(RefreshToken.Used)},{nameof(RefreshToken.Invalidated)}=@{nameof(RefreshToken.Invalidated)} " +
+                $"{nameof(RefreshToken.ExpirationDate)}=@{nameof(RefreshToken.ExpirationDate)},{nameof(RefreshToken.Used)}=@{nameof(RefreshToken.Used)},{nameof(RefreshToken.Invalidated)}=@{nameof(RefreshToken.Invalidated)}, " +
                 $"{nameof(RefreshToken.Token)}=@{nameof(RefreshToken.Token)} WHERE {nameof(RefreshToken)}.{nameof(RefreshToken.Id)} = @{nameof(RefreshToken.Id)};"
             };
             Database.Connection.Open();

@@ -13,6 +13,7 @@ using StogoBagazines.ApiRequests;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace StogoBagazines.Services
 {
@@ -26,10 +27,11 @@ namespace StogoBagazines.Services
         private readonly TokenValidationParameters tokenValidationParameters;
         private readonly RefreshTokenService refreshTokenService;
 
-        public UserService(JwtOptions jwtOptions, Database database) : base(database)
+        public UserService(JwtOptions jwtOptions, Database database, TokenValidationParameters validationParameters) : base(database)
         {
             this.jwtOptions = jwtOptions;
             refreshTokenService = new RefreshTokenService(database);
+            this.tokenValidationParameters = validationParameters;
         }
 
         public User Authetificate(string email, string password)
@@ -279,7 +281,6 @@ namespace StogoBagazines.Services
         public AuthResponse RefreshToken(string token, string refreshToken)
         {
             var validatedToken = GetPrincipalFromToken(token);
-            var 
             if (validatedToken == null)
             {
                 return new AuthResponse
@@ -289,7 +290,7 @@ namespace StogoBagazines.Services
             }
 
             var expirationDate = long.Parse(validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-            DateTime expirationDateUtc = new DateTime(DateTime.UnixEpoch.Ticks, DateTimeKind.Utc).AddSeconds(expirationDate).Subtract(jwtOptions.TokenLifetime);
+            DateTime expirationDateUtc = new DateTime(DateTime.UnixEpoch.Ticks, DateTimeKind.Utc).AddSeconds(expirationDate);
 
             if (expirationDateUtc > DateTime.UtcNow)
             {
@@ -299,7 +300,7 @@ namespace StogoBagazines.Services
                 };
             }
             string jti = validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
-            var storedRefreshToken = refreshTokenService.Read(jti);
+            var storedRefreshToken = refreshTokenService.Read(refreshToken);
             if (storedRefreshToken == null)
             {
                 return new AuthResponse
@@ -320,8 +321,52 @@ namespace StogoBagazines.Services
                 return new AuthResponse
                 { Message = "This refresh token has been used already" };
             }
-        }
+            if(storedRefreshToken.JwtId != jti)
+            {
+                return new AuthResponse
+                { Message = "This refresh token doesn't match this Jwt" };
+            }
 
+            storedRefreshToken.Used = true;
+            User user = Read((object)validatedToken.Claims.Single(x => x.Type == "id").Value);
+            refreshTokenService.Update(storedRefreshToken.Id, storedRefreshToken);
+            
+            return GenerateAuthentificationResultForUser(user);
+        }
+        public AuthResponse GenerateAuthentificationResultForUser(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(jwtOptions.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim("id", user.Id.ToString())
+                }),
+                Expires = DateTime.UtcNow.Add(jwtOptions.TokenLifetime),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var refreshToken = new RefreshToken
+            {
+                JwtId = token.Id,
+                UserId = user.Id,
+                CreationDate = DateTime.UtcNow,
+                ExpirationDate = DateTime.UtcNow.AddMonths(6),
+                Token = Guid.NewGuid().ToString()
+            };
+            refreshTokenService.Create(refreshToken);
+            return new AuthResponse
+            {
+                Token = tokenHandler.WriteToken(token),
+                RefreshToken = refreshToken.Token,
+                Message = "Authenticated"
+            };
+        }
         private ClaimsPrincipal GetPrincipalFromToken(string token)
         {
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
@@ -337,9 +382,9 @@ namespace StogoBagazines.Services
                 }
                 return principal;
             }
-            catch
+            catch (SecurityTokenValidationException ex)
             {
-                return null;
+                throw ex;
             }
         }
         private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)

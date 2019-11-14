@@ -48,9 +48,9 @@ namespace StogoBagazines.Controllers
         /// <param name="logger">Dependency injection logging object</param>
         /// <param name="jwtOptions">Dependency injection jwtOptions object</param>
         /// <param name="database">Dependency injection database object</param>
-        public UsersController(ILogger<UsersController> logger, JwtOptions jwtOptions, Database database)
+        public UsersController(ILogger<UsersController> logger, JwtOptions jwtOptions, Database database, TokenValidationParameters tokenValidationParameters)
         {
-            userService = new UserService(jwtOptions, database);
+            userService = new UserService(jwtOptions, database, tokenValidationParameters);
             tokenService = new RefreshTokenService(database);
             this.logger = logger;
             this.database = database;
@@ -66,29 +66,7 @@ namespace StogoBagazines.Controllers
             {
                 return BadRequest(new { message = "Provided credentials are incorrect!" });
             }
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(jwtOptions.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new []
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim("id", user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.Add(jwtOptions.TokenLifetime),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return Ok(new AuthResponse
-            {
-                Message = "Authentificated",
-                Token = tokenHandler.WriteToken(token),
-                RefreshToken = 
-            });
+            return Ok(userService.GenerateAuthentificationResultForUser(user));
         }
 
         [AllowAnonymous]
@@ -120,39 +98,12 @@ namespace StogoBagazines.Controllers
             return NoContent();
         }
 
-        [HttpPost("refresh")]
         [AllowAnonymous]
-        [HttpPost("authenticate")]
+        [HttpPost("refesh")]
         public IActionResult Refresh([FromBody]RefreshTokenRequest request)
         {
-            User user = userService.RefreshToken(request.Email, request.Password);
-            if (user == null)
-            {
-                return BadRequest(new { message = "Provided credentials are incorrect!" });
-            }
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(jwtOptions.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim("id", user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.Add(jwtOptions.TokenLifetime),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return Ok(new AuthResponse
-            {
-                Message = "Authentificated",
-                Token = tokenHandler.WriteToken(token),
-                RefreshToken =
-            });
+            AuthResponse response = userService.RefreshToken(request.Token, request.RefreshToken);
+            return Ok(response);
         }
     }
 }
