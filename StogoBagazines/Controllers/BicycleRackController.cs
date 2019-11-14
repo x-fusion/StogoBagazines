@@ -10,6 +10,7 @@ using StogoBagazines.DataAccess.Repositories;
 using StogoBagazines.DataAccess.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using StogoBagazines.ApiRequests;
 
 namespace StogoBagazines.Controllers
 {
@@ -43,6 +44,7 @@ namespace StogoBagazines.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult<IEnumerable<BicycleRack>> Get()
         {
             List<BicycleRack> results = repository.ReadAll().ToList();
@@ -51,6 +53,7 @@ namespace StogoBagazines.Controllers
                 return Ok(results);
             }
             return NoContent();
+
         }
 
         // GET: api/BicycleRack/5
@@ -62,6 +65,7 @@ namespace StogoBagazines.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult<BicycleRack> Get(int id)
         {
             BicycleRack result = repository.Read(id);
@@ -69,7 +73,10 @@ namespace StogoBagazines.Controllers
             {
                 return Ok(result);
             }
-            return NotFound(new KeyValuePair<string, int>("id", id));
+            return NotFound(new Response
+            {
+                Message = $"Object with {id} doesn't exist"
+            });
         }
 
         // POST: api/BicycleRack
@@ -80,9 +87,16 @@ namespace StogoBagazines.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Post([FromBody] BicycleRack value)
         {
-            return Ok(new KeyValuePair<string, string>("id", repository.Create(value).ToString()));
+            object id = repository.Create(value);
+            value.Id = int.Parse(id.ToString());
+            return Ok(new Response
+            {
+                Message = "Succesfully submitted",
+                Payload = value
+            });
         }
 
         // PUT: api/BicycleRack/5
@@ -94,6 +108,7 @@ namespace StogoBagazines.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Put(int id, [FromBody] BicycleRack value)
         {
@@ -101,10 +116,17 @@ namespace StogoBagazines.Controllers
             {
                 if (repository.Update(id, value))
                 {
-                    return Ok();
+                    return Ok(new Response
+                    {
+                        Message = "Succesfully updated",
+                        Payload = value
+                    });
                 }
             }
-            return NotFound(new KeyValuePair<string, int>("id", id));
+            return NotFound(new Response
+            {
+                Message = $"Object with {id} doesn't exist"
+            });
         }
 
         // DELETE: api/BicycleRack/5
@@ -114,6 +136,7 @@ namespace StogoBagazines.Controllers
         /// <param name="id">Inventory entry to be deleted reference</param>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
@@ -121,10 +144,16 @@ namespace StogoBagazines.Controllers
             {
                 if (repository.Delete(id))
                 {
-                    return Ok();
+                    return Ok(new Response
+                    {
+                        Message = "Succesfully deleted"
+                    });
                 }
             }
-            return NotFound(new KeyValuePair<string, int>("id", id));
+            return NotFound(new Response
+            {
+                Message = $"Object with {id} doesn't exist"
+            });
         }
     }
 }

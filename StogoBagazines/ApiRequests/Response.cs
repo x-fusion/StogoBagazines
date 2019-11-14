@@ -8,5 +8,6 @@ namespace StogoBagazines.ApiRequests
     public class Response
     {
         public string Message { get; set; }
+        public object Payload { get; set; }
     }
 }
