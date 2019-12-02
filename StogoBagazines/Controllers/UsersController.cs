@@ -103,7 +103,8 @@ namespace StogoBagazines.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Authorize(Roles = "SysAdmin")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [Authorize(Roles = Role.SysAdmin)]
         public ActionResult<IEnumerable<User>> Get()
         {
             List<User> users = userService.ReadAll().ToList();
@@ -115,7 +116,7 @@ namespace StogoBagazines.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("refesh")]
+        [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Refresh([FromBody]RefreshTokenRequest request)

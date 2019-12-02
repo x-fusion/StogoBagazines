@@ -17,15 +17,6 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "StogoBagazines": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "weatherforecast",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
-    },
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
@@ -35,8 +26,17 @@
         "ASPNETCORE_HTTPS_PORT": "44337"
       },
       "httpPort": 53907,
-      "useSSL": true,
-      "sslPort": 44337
+      "sslPort": 44337,
+      "useSSL": true
+    },
+    "StogoBagazines": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
   }
 }

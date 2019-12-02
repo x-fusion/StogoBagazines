@@ -361,6 +361,7 @@ namespace StogoBagazines.Services
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim("Role", user.Role),
                     new Claim("id", user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.Add(jwtOptions.TokenLifetime),
