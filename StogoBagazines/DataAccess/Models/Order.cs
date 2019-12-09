@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace StogoBagazines.DataAccess.Models
 {
     /// <summary>
-    /// Base class of warehouse items
+    /// Warehouse rent object containing details about real world 
     /// </summary>
-    public class InventoryBase : IValidatableObject
+    public class Order : IValidatableObject
     {
         /// <summary>
         /// Identification key
@@ -18,42 +18,40 @@ namespace StogoBagazines.DataAccess.Models
         /// <summary>
         /// Item's title
         /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Title is manditory field")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Customer is manditory field")]
         [StringLength(255, ErrorMessage = "Length has to be between 5 and 255 symbols", MinimumLength = 5)]
-        [DataType(DataType.Text, ErrorMessage = "Invalid title provided")]
-        public string Title { get; set; }
+        [DataType(DataType.Text, ErrorMessage = "Invalid customer provided")]
+        public string Customer { get; set; }
         /// <summary>
-        /// Count of particular item in warehouse
-        /// </summary>
-        [Required(ErrorMessage = "Amount is manditory field")]
-        [Range(0, int.MaxValue, ErrorMessage = "Not valid integer value")]
-        public int Amount { get; set; }
-        /// <summary>
-        /// Price for renting purposes
+        /// Value which can be assigned and used instead of CalculatedPrice (for manually asigned price operations)
         /// </summary>
         [Range(0, double.MaxValue, ErrorMessage = "Not valid decimal value")]
-        public decimal RentPrice => decimal.Multiply(MonetaryValue, MonetaryValue / 10);
+        public decimal CustomPrice { get; set; }
         /// <summary>
-        /// Revenue generated during rentals
+        /// Value which is calculated from every order item
         /// </summary>
-        [Range(0, double.MaxValue, ErrorMessage = "Not valid decimal value")]
-        public decimal Revenue { get; set; }
-        /// <summary>
-        /// Days spent at rent
-        /// </summary>
-        [Range(0, int.MaxValue, ErrorMessage = "Not valid integer value")]
-        public int TotalRentDuration { get; set; }
-        /// <summary>
-        /// Price used for selling purposes
-        /// </summary>
-        [Required(ErrorMessage = "Monetary value is manditory field")]
-        [Range(0, double.MaxValue, ErrorMessage = "Not valid decimal value")]
-        [DataType(DataType.Currency, ErrorMessage = "Invalid value provided")]
-        public decimal MonetaryValue { get; set; }
+        public decimal CalculatedPrice
+        {
+            get
+            {
+                decimal sum = 0;
+                RoofRacks.ForEach(x => sum += x.Item1.RentPrice * x.Item2);
+                BicycleRacks.ForEach(x => sum += x.Item1.RentPrice * x.Item2);
+                Crossbars.ForEach(x => sum += x.Item1.RentPrice * x.Item2);
+                Others.ForEach(x => sum += x.Item1.RentPrice * x.Item2);
+                WheelChains.ForEach(x => sum += x.Item1.RentPrice * x.Item2);
+                return sum;
+            }
+        }
+        List<Tuple<RoofRack, int>> RoofRacks { get; set; }
+        List<Tuple<BicycleRack, int>> BicycleRacks { get; set; }
+        List<Tuple<Crossbar, int>> Crossbars { get; set; }
+        List<Tuple<WheelChain, int>> WheelChains { get; set; }
+        List<Tuple<Other, int>> Others { get; set; }
         /// <summary>
         /// Constructor used in serialization
         /// </summary>
-        public InventoryBase()
+        public Order()
         {
         }
         /// <summary>
