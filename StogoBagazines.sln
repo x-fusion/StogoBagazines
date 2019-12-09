@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StogoBagazines", "StogoBagazines\StogoBagazines.csproj", "{B3614741-33F3-48C5-87DC-E6F57312718E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiTest", "WebApiTest\WebApiTest.csproj", "{8603F160-9F4A-4EB1-9BB9-F12022A44201}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{B3614741-33F3-48C5-87DC-E6F57312718E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3614741-33F3-48C5-87DC-E6F57312718E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3614741-33F3-48C5-87DC-E6F57312718E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8603F160-9F4A-4EB1-9BB9-F12022A44201}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8603F160-9F4A-4EB1-9BB9-F12022A44201}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8603F160-9F4A-4EB1-9BB9-F12022A44201}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8603F160-9F4A-4EB1-9BB9-F12022A44201}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
